@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { Blacklist } = require("../../modules/users/userModel");
 
 const authenticateJWT = async (req, res, next) => {
     const token = req.headers.authorization.split(" ")[1];
@@ -8,6 +9,14 @@ const authenticateJWT = async (req, res, next) => {
             message: 'Token diperlukan'
         })
     }
+
+    const checkIfBlacklisted = await Blacklist.findOne({where: { token: token }});
+    if (checkIfBlacklisted) {
+        return res.status(401).json({
+            message: 'Unauthorized'
+        })
+    }
+
     const secret = process.env.ACCESS_TOKEN_SECRET;
 
     try {
@@ -18,8 +27,7 @@ const authenticateJWT = async (req, res, next) => {
 
     } catch (error) {
         return res.status(401).json({
-            message: 'Unauthorized',
-            token: token
+            message: 'Unauthorized'
         })
     }
 }
