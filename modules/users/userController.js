@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const signup = async (req, res) => {
-    const data = { username, email, password } = req.body;
+    const { username, email, password } = req.body;
     const salt = 10;
     const hashPass = await bcrypt.hash(password, salt);
     const usernameExists = await User.findOne({ where: { email: req.body.username } });
@@ -71,13 +71,19 @@ const login = async (req, res) => {
         }
 
         // If password matches, generate access and refresh tokens
+        const id = user.id;
         const username = user.username;
         const email = user.email;
+        const role = user.role;
+        const created_at = user.created_at;
 
         const token = jwt.sign(
             {
+                id,
                 username,
-                email
+                email,
+                role,
+                created_at
             },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: "1h" }
@@ -87,8 +93,11 @@ const login = async (req, res) => {
         res.status(200).json({
             messagge: "Login berhasil dilakukan.",
             loginResult: {
-                email,
+                id,
                 username,
+                email,
+                role,
+                created_at,
                 token
             }
         });
