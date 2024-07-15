@@ -5,7 +5,7 @@ const addExpense = async (req, res) => {
     const {category, amount, description, date} = req.body;
     try {
         const newExpense = await Expense.create({
-            user_id: req.id,
+            user_id: req.user.id,
             category,
             amount,
             description,
