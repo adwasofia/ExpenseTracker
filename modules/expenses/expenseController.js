@@ -50,7 +50,7 @@ const getExpense = async (req, res) => {
 const getExpenseById = async (req, res) => {
     const user_id = req.user.id;
     if (!user_id || !req.params.id) {
-        res.status(400).json({message: "User ID and Expense ID is required."});
+        res.status(400).json({message: "User ID and Expense ID are required."});
     }
     try {
         const expense = await Expense.findOne({
@@ -100,4 +100,27 @@ const updateExpense = async (req, res) => {
     }
 };
 
-module.exports = {addExpense, getExpense, getExpenseById, updateExpense};
+const deleteExpenseById = async (req, res) => {
+    const user_id = req.user.id;
+    if (!user_id || !req.params.id) {
+        res.status(400).json({message: "User ID and Expense ID are required"});
+    }
+    try {
+        const expense = await Expense.findOne({
+            where: {user_id: user_id, id: req.params.id}
+        });
+        if (!expense) {
+            res.status(404).json({message: "Expense is not found."});
+        } else {
+            await expense.destroy();
+            res.status(200).json({message: "An expense is successfully deleted!"});
+        }
+    } catch (erorr) {
+        res.status(500).json({
+            message: "Error deleting an expense.",
+            details: error.message
+        });
+    }
+};
+
+module.exports = {addExpense, getExpense, getExpenseById, updateExpense, deleteExpenseById};
