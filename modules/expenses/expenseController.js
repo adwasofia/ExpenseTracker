@@ -3,6 +3,11 @@ const Expense = require("./expenseModel");
 
 const addExpense = async (req, res) => {
     const {category, amount, description, date} = req.body;
+    if (!category || !amount || !description || !date) {
+        res.status(400).json({
+            message: "Category, amount, description, and date are required."
+        })
+    }
     try {
         const newExpense = await Expense.create({
             user_id: req.user.id,
