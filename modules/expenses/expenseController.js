@@ -29,10 +29,46 @@ const addExpense = async (req, res) => {
 
 };
 
+const getExpense = async (req, res) => {
+    const user_id = req.user.id;
+    if (!user_id) {
+        res.status(400).json({message: "User ID is required."});
+    }
+    try {
+        const expenses = await Expense.findAll({
+            where: {user_id: user_id}
+        });
+        res.status(200).json(expenses);
+    } catch (error) {
+        res.status(500).json({
+            message: "Error fetching expenses.",
+            details: error.message
+        });
+    }
+};
+
+const getExpenseById = async (req, res) => {
+    const user_id = req.user.id;
+    if (!user_id || !req.params.id) {
+        res.status(400).json({message: "User ID and Expense ID is required."});
+    }
+    try {
+        const expense = await Expense.findOne({
+            where: {user_id: user_id, id: req.params.id}
+        });
+        res.status(200).json(expense);
+    } catch (error) {
+        res.status(500).json({
+            message: "Error fetching expenses.",
+            details: error.message
+        });
+    }
+};
+
 const updateExpense = async (req, res) => {
     const user_id = req.user.id;
-    if (!user_id || !req.body.category || !req.body.amount || !req.body.description || !req.body.date) {
-        res.status(400).json({message: "User ID, Category, Amount, Description, and Date are required."});
+    if (!user_id || !req.params.id || !req.body.category || !req.body.amount || !req.body.description || !req.body.date) {
+        res.status(400).json({message: "User ID, Expense ID, Category, Amount, Description, and Date are required."});
     }
     let user = await User.findOne({
         where: { id: user_id }
@@ -64,4 +100,4 @@ const updateExpense = async (req, res) => {
     }
 };
 
-module.exports = {addExpense, updateExpense};
+module.exports = {addExpense, getExpense, getExpenseById, updateExpense};
