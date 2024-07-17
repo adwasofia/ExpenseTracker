@@ -62,11 +62,41 @@ const categoryReport = async (req, res) => {
         });
     }
 }
+
 // 3. Yearly Spending Report: GET /api/reports/yearly-spending
 // Provides a report of the user's spending for a specific year.
+const yearlyReport = async (req, res) => {
+    const user_id = req.user.id;
+    const { year } = req.query;
+    if (!user_id || !year) {
+        return res.status(400).json({message: "User ID and Year are required."});
+    }
+    const startDate = new Date(year, 0, 1);
+    const endDate = new Date(year, 12, 0);
+    try {
+        expenses = await Expense.findAll({
+            where: {
+                user_id: user_id,
+                date: {
+                    [Op.between]: [startDate, endDate]
+                }
+            }
+        });
+        if (!expenses) {
+            return res.status(404).json({message: "Expenses not found."});
+        }
+        return res.status(200).json(expenses);
+    } catch (error) {
+        return res.status(500).json({
+            message: "Internal server error.",
+            details: error.message
+        });
+    }
+}
+
 // 4. Custom Date Range Report: GET /api/reports/custom-spending
 // Provides a report of the user's spending for a custom date range.
 // 5. Top Expenses Report: GET /api/reports/top-expenses
 // Lists the top N expenses for a specified period.
 
-module.exports = {monthlyReport, categoryReport};
+module.exports = {monthlyReport, categoryReport, yearlyReport};
