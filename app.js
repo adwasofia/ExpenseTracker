@@ -3,12 +3,14 @@ const { startdb } = require("./config/database");
 const authenticateJWT = require("./libraries/authenticator/jwtAuthenticator");
 const {userRoutes} = require("./modules/users/userRoutes");
 const {expenseRoutes} = require("./modules/expenses/expenseRoutes");
+const {reportRoutes} = require("./modules/reports/reportRoutes");
 
 const app = express();
 
 app.use(express.json());
 app.use(userRoutes);
 app.use(expenseRoutes);
+app.use(reportRoutes);
 
 startdb();
 
